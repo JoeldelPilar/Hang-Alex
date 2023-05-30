@@ -3,7 +3,10 @@
 	import BaseInput from './Base/BaseInput.vue';
 	import LetterButton from './LetterButton.vue';
 	import LetterSpan from './LetterSpan.vue';
+	import ManSvg from './ManSvg.vue';
 	import { Letter, alphabetLetters } from '../Letter';
+
+	const wrongGuessesLeft = ref<number>(8);
 
 	const solutionWord = ref('');
 
@@ -22,26 +25,36 @@
 	};
 
 	const checkLetter = (letter: string) => {
+		let isCorrect = false;
 		solutionLetters.value.map((letterObject) => {
 			if (letter === letterObject.char) {
 				letterObject.show = true;
+				isCorrect = true;
+				return letterObject;
+			} else {
 				return letterObject;
 			}
-			return letterObject;
 		});
 		console.log(solutionLetters.value);
+		if (!isCorrect) {
+			wrongGuessesLeft.value -= 1;
+		}
+		console.log(wrongGuessesLeft.value);
 	};
 </script>
 
 <template>
+	<ManSvg :wrongGuessesLeft="wrongGuessesLeft"></ManSvg>
+	<h1>Hang Alex</h1>
+
 	<main>
 		<form
 			@submit.prevent="startGame"
 			v-if="!gameStarted"
 		>
 			<BaseInput
-				label="Skriv ditt ord"
-				type="text"
+				label="Type in a word"
+				type="password"
 				v-model="solutionWord"
 			/>
 			<button>Lets Hang!</button>
@@ -51,8 +64,8 @@
 			<LetterSpan
 				v-for="(letter, index) in solutionLetters"
 				:key="index"
-				>{{ letter }}</LetterSpan
-			>
+				:letter="letter"
+			></LetterSpan>
 		</div>
 
 		<div
@@ -74,6 +87,7 @@
 	.button__container {
 		display: flex;
 		gap: 0.5rem;
+		justify-content: center;
 	}
 
 	.letterspan__container {
